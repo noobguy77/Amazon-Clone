@@ -39,6 +39,23 @@ const checkUser = (req, res, next) => {
         next();
     }
 };
+const requireAuthAdmin = (req, res, next) => {
+    const token = req.cookies.jwt;
+    // check json web token exists & is verified
+    if (token && req.cookies.admin === "true") {
+        jwt.verify(token, process.env.secret, (err, decodedToken) => {
+        if (err) {
+            console.log(err.message);
+            res.redirect('/login');
+        } else {
+            console.log(decodedToken);
+            next();
+        }
+        });
+    } else {
+        res.redirect('/login');
+    }
+};
 
 
-module.exports = { requireAuth, checkUser };
+module.exports = { requireAuth, checkUser, requireAuthAdmin };

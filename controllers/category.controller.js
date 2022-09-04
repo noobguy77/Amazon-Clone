@@ -3,10 +3,7 @@ const Category = require('../models/category.model')
 
 const handleErrors = (err) => {
     let errors = { categoryName: ''};
-    console.log(err,"lol");
-    // duplicate email and username error
     if (err.code === 11000) {
-        // console.log(err.message,"lol");
         if(err.keyValue.categoryName)
         {
             errors.categoryName = 'Category is already registered';
@@ -18,8 +15,15 @@ const handleErrors = (err) => {
 const category_create = async(req,res) => {
     const { categoryName }= req.body;
     try {
-        const category = await Category.create({categoryName});
-        res.status(200).send({category : categoryName});
+        await Category.find({})
+        .then(async(data) => {
+            var categoryId = data.length+1;
+            const category = await Category.create({categoryName, categoryId});
+            res.status(200).send({category : categoryName,categoryId : categoryId});
+        })
+        .catch((err) => {
+            res.status(400).send(err.message);
+        })
     }
     catch(err) {
         const errors = handleErrors(err);

@@ -1,11 +1,10 @@
 const Product = require('../models/product.model')
-const { uuid } = require('uuidv4');
+const Category = require('../models/category.model')
+const { v4: uuidv4 } = require('uuid');
 
 const handleErrors = (err) => {
     let errors = { productName : ''};
-    // duplicate email and username error
     if (err.code === 11000) {
-        // console.log(err.message,"lol");
         if(err.keyValue.productName)
         {
             errors.productName = 'Product is already registered';
@@ -15,10 +14,20 @@ const handleErrors = (err) => {
 }
 
 const product_create = async(req,res) => {
+    const {productName, price, categoryName } = req.body;
     try {
-        var prodId = uuid();
-        const product = await Product.create(prodId,req.body.productName,req.body,price,0,req.body.categoryName);
-        res.status(200).send({product});
+        var prodId = uuidv4();
+        var discount = 0;
+        Category.findOne({categoryName : req.body.categoryName})
+        .then(async(data) => {
+            console.log(data);
+            var categoryId = Number(data.categoryId);
+            const product = await Product.create({prodId,productName,price,discount,categoryId});
+            res.status(200).send(product);
+        })
+        .catch((err) => {
+            res.status(400).send(err.message);
+        })
     }
     catch(err) {
         const errors = handleErrors(err);
@@ -26,6 +35,17 @@ const product_create = async(req,res) => {
     }
 }
 
+const fetch_products = (req,res) => {
+    Product.find({categoryId : Number(req.params.categoryId)})
+    .then((data) => {
+        res.status(200).send(data);
+    })
+    .catch((err) => {
+        res.status(400).send(err.message);
+    })
+}
+
 module.exports = {
-    product_create
+    product_create,
+    fetch_products
 }

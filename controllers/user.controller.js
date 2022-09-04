@@ -1,5 +1,4 @@
 const User = require('../models/user.model')
-const md5 = require('md5')
 const jwt = require('jsonwebtoken')
 
 const handleErrors = (err) => {
@@ -75,6 +74,12 @@ const login_post = async(req,res) => {
         res.cookie('jwt',token,{httpOnly : true, maxAge : 60*60*1000});
         res.cookie('username',user.username);
         res.cookie('email',user.email);
+        console.log(user.username);
+        if(user.username === "admin")
+        {
+            console.log(user.username);
+            res.cookie('admin',true);
+        }
         res.status(200).json({user : user._id});
     }
     catch(err) {
@@ -84,6 +89,7 @@ const login_post = async(req,res) => {
 }
 const logout_get = (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 });
+    res.cookie('admin', false,);
     res.redirect('/');
 }
 

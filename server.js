@@ -1,10 +1,19 @@
 const express = require('express')
 const mongoose = require('mongoose');
-const userRoutes = require('./routes/user.routes');
 const categoryRoutes = require('./routes/category.route');
+const productRoutes = require('./routes/product.route');
+const userRoutes = require('./routes/user.routes');
+
+
+//models
+const categoryModel = require('./models/category.model');
+const productModel = require('./models/product.model');
+
+
 const {
     requireAuth,
-    checkUser
+    checkUser,
+    requireAuthAdmin
 } = require('./middleware/user.middleware')
 const cookieParser = require('cookie-parser')
 require('dotenv').config()
@@ -37,9 +46,27 @@ mongoose.connect(process.env.dbURI, {
 
 app.use("*", checkUser);
 app.get('/', requireAuth, (req, res) => {
-    res.render("home");
+    categoryModel.find({})
+    .then((data) => {
+        res.render("home",{data});
+    })
+    .catch((err) => {
+        res.send("Error Occurred!");
+    })
+})
+app.get('/admin',requireAuthAdmin, (req, res) => {
+    res.send("admin");
+})
+
+app.get('/products/:categoryId', (req,res) => {
+    console.log(req.params);
+    productModel.find({categoryId : Number(req.params.categoryId)})
+    .then((data) => {
+        res.render("products",{data});
+    })
 })
 app.use(userRoutes);
 app.use(categoryRoutes);
+app.use(productRoutes);
 
 //cookies

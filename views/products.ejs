@@ -65,7 +65,7 @@
     <!-- page title -->
     <section class="page-title bg-primary position-relative">
         <center>
-            <h2 class="text-white font-tertiary">Available Categories:</h2>
+            <!-- <h2 class="text-white font-tertiary">Available Categories:</h2> -->
         </center>
         <br />
     </section>
@@ -73,10 +73,11 @@
     <section class="section">
         <% for(var i =0;i<data.length;i++) { %>
         <a
-            href="/products/<%= data[i].categoryId %>"
+            href="#"
             class="practiceItem"
         >
-        <%= data[i].categoryName %>
+        <p> Name: <%= data[i].productName %></p>
+        <p>Price:<%= data[i].price %></p>
         </a>
         <% } %>
     </section>
