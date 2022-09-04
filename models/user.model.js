@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please enter your password!'],
         minLength: [6, 'Password should be atleast 6 characters!']
     },
+    admin : {
+        type : Boolean
+    }
 })
 
 userSchema.pre('save',async function (next) {
